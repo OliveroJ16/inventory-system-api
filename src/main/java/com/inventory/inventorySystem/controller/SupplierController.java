@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,19 +25,21 @@ public class SupplierController{
 
     private final SupplierService supplierService;
 
-    @PostMapping
+    @PostMapping@PreAuthorize("hasAnyRole('ADMIN'")
     public ResponseEntity<SupplierResponse> registerSupplier(@Validated(OnCreate.class) @RequestBody SupplierRequest supplierRequest){
         SupplierResponse supplierResponse = supplierService.saveSupplier(supplierRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(supplierResponse);
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN'")
     public ResponseEntity<SupplierResponse> updateSupplier(@PathVariable UUID id, @Validated(OnUpdate.class) @RequestBody SupplierRequest supplierRequest){
         SupplierResponse supplierResponse = supplierService.updateSupplier(id, supplierRequest);
         return ResponseEntity.status(HttpStatus.OK).body(supplierResponse);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN'")
     public ResponseEntity<PaginatedResponse<SupplierResponse>> getAllSupplier(@PageableDefault(page = 0, size = 10, sort = "full_name", direction = Sort.Direction.ASC) Pageable pageable){
         PaginatedResponse<SupplierResponse> supplierResponse = supplierService.getAllSupplier(pageable);
         return  ResponseEntity.status(HttpStatus.OK).body(supplierResponse);

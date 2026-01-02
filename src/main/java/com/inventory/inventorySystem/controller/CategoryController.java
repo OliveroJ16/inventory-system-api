@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +27,21 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> saveCategory(@Validated(OnCreate.class) @RequestBody CategoryRequest categoryRequest){
         CategoryResponse categoryResponse = categoryService.saveCategory(categoryRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryResponse);
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable UUID id, @Validated(OnUpdate.class)  @RequestBody CategoryRequest categoryRequest) {
         CategoryResponse categoryResponse = categoryService.updateCategory(id, categoryRequest);
         return ResponseEntity.status(HttpStatus.OK).body(categoryResponse);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CASHIER')")
     public ResponseEntity<PaginatedResponse<CategoryResponse>>getAllCategories(@RequestParam(required = false) String name, @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         PaginatedResponse<CategoryResponse> categoryResponse = categoryService.getAllCategories(name, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(categoryResponse);

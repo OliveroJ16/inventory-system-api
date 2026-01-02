@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,12 +26,14 @@ public class SaleController {
     private final SaleService saleService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CASHIER')")
     public ResponseEntity<CompleteSaleResponse> registerSale(@RequestBody  SaleRequest saleRequest){
         CompleteSaleResponse completeSaleResponse = saleService.registerSale(saleRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(completeSaleResponse);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<PaginatedResponse<SaleResponse>> getAllSales(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,

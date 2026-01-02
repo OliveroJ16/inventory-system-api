@@ -17,6 +17,7 @@ import com.inventory.inventorySystem.service.interfaces.AuthService;
 import com.inventory.inventorySystem.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -53,8 +54,8 @@ public class AuthServiceImpl implements AuthService {
         var userResponse = userMapper.toDto(user);
         String accessToken = jwtTokenProvider.generateAccessToken(userResponse);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userResponse);
-        var token = tokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Token", "userId", user.getId()));
+        Token token = tokenRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new InsufficientAuthenticationException("Authentication failed"));
         token.setRevoked(false);
         token.setExpired(false);
         token.setRefreshToken(refreshToken);

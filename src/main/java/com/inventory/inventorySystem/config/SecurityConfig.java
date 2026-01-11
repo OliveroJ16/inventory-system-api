@@ -59,7 +59,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                                .requestMatchers("/api/v1/auth/refresh", "/api/v1/auth/login", "/api/v1/auth/register")
+                                .requestMatchers(
+                                        "/swagger-ui.html",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**"
+                                ).permitAll()
+                                .requestMatchers(
+                                        "/api/v1/auth/refresh",
+                                        "/api/v1/auth/login",
+                                        "/api/v1/auth/register")
                                 .permitAll().anyRequest().authenticated()
                         ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

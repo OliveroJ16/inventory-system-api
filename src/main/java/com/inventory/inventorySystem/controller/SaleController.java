@@ -5,6 +5,8 @@ import com.inventory.inventorySystem.dto.response.CompleteSaleResponse;
 import com.inventory.inventorySystem.dto.response.PaginatedResponse;
 import com.inventory.inventorySystem.dto.response.SaleResponse;
 import com.inventory.inventorySystem.service.interfaces.SaleService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,12 +23,21 @@ import java.time.LocalDateTime;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/sales")
+@Tag(
+        name = "Sales",
+        description = "Sales registration, queries and payment management"
+)
+
 public class SaleController {
 
     private final SaleService saleService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'CASHIER')")
+    @Operation(
+            summary = "Register sale",
+            description = "Registers a new sale. Accessible by ADMIN and CASHIER roles."
+    )
     public ResponseEntity<CompleteSaleResponse> registerSale(@RequestBody  SaleRequest saleRequest){
         CompleteSaleResponse completeSaleResponse = saleService.registerSale(saleRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(completeSaleResponse);
@@ -34,6 +45,10 @@ public class SaleController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
+    @Operation(
+            summary = "Get sales",
+            description = "Returns a paginated list of sales filtered by date range or customer name. Requires ADMIN role."
+    )
     public ResponseEntity<PaginatedResponse<SaleResponse>> getAllSales(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
